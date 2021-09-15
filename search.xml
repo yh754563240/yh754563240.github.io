@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>袁辉test</title>
+    <title>【图文】STM32嵌入式开发：STM32的时钟树（STM32驱动的根本之源）</title>
     <url>/2021/09/10/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.<br>date:1010.09.06<br><img src="20200317112515612.jpg" alt="20200317112515612"> #图片</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ 11</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+    <content><![CDATA[<p><img src="20200317112515612.jpg" alt="20200317112515612"> #图片</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通俗易懂的讲，时钟是单片机的心跳，脉搏，没有时钟的话，单片机无法进行工作。时钟的来源一般由RC震荡电路或者晶振来提供。为什么要配置时钟系统呢，因为配置时钟系统可以让单片机发挥针对于当前场景，当前项目，最优的运行方式，达到降低功耗，降低不必要的干扰，提高单片机系统（STM32系统）的整体稳定性，合适的配置时钟系统能让实际项目在运行中事半功倍，合适指的是适当的片上外设基本上都有适用于该外设的时钟频率。不同的单片机有不同的推荐时钟频率以及最大限度时钟频率等。</p>
+<h3 id="STM32的时钟源"><a href="#STM32的时钟源" class="headerlink" title="STM32的时钟源"></a>STM32的时钟源</h3><p>STM32的时钟源分为两大类：内部/外部，高速/低速<br>组合起来为四种：内部高速/内部低速/外部高速/外部高速<br>ps：内部时钟为MCU的RC震荡电路产生的方波，RC震荡电路一般不是太稳定，所以一般都是用外部独立晶振作为STM32的系统时钟源，内部时钟一般作为备选时钟源。</p>
+<p>HSI(high speed inter)：内部高速时钟,具有8MHz的频率。<br>LSI(low speed inter)：内部低速时钟，具有40KHz的频率。<br>HSE(low speed extern)：外部高速时钟，接4MHz~16MHz的频率的晶振。<br>LSE(low speed extern)：外部低速时钟，接32.768kHz的频率的晶振。<br>ps：为什么外部低速时钟（实时时钟）的频率是特殊的32.768Khz，因为石英钟内部的分配器最多只能分频15次，2的15次方为32768，32768Hz刚好经过15次分频后不多不少的获得了1Hz的分频频率，对应了现实世界中的每秒钟走一次（Hz是频率单位，为一秒钟内进行的次数），假设换做其他频率的时钟，分频15次后就不是1Hz的输出的秒信号，因此不准确，32.768KHz也是非常多的工程师在实际项目中不断总结得出的实时时钟频率的一个结论。</p>
+<p>下图为STM32时钟系统的时钟树<br><img src="STM32%E6%97%B6%E9%92%9F%E6%A0%91.png" alt="STM32时钟树"></p>
+<h3 id="STM32需要配置的时钟"><a href="#STM32需要配置的时钟" class="headerlink" title="STM32需要配置的时钟"></a>STM32需要配置的时钟</h3><p>从上图的STM32的时钟数可以看出，STM32的时钟系统已经集成了PLL倍频器以及分频器<br>主要为两个重要的时钟，可以这么理解，一个是面向STM32世界的，一个是面向现实世界的。</p>
+<p>面向STM32世界的：SYSCLK系统时钟<br>面向现实世界的：RTCCLK实时时钟</p>
+<p>SYSCLK系统时钟：经过PLL倍频或者分频为STM32的各个外设总线提供了工作的必要条件，也可以结合现实世界理解，频率越快，工作效率就越高，但是消耗也就越大，在单片机（STM32）的世界照样适用，因此针对不同的外设得选取适当得工作频率，而不是越大越好，技能保证工作效率，又能保证功耗得降低。通过STM32时钟系统的时钟树也能看出各个片上外设需求得频率各不相同。<br>RTCCLK实时时钟：就是现实世界的实时时钟，32768Hz的频率经过15次分频后，刚好为一秒1Hz，对应于现实世界的秒。</p>
+<h3 id="STM32时钟的配置"><a href="#STM32时钟的配置" class="headerlink" title="STM32时钟的配置"></a>STM32时钟的配置</h3><p>从上图的时钟树不难发现还有一个CSS检测装置，该装置的作用是，如果检测到外部时钟HSE不工作时，则自动切换为内部时钟HSI为系统提供可靠的实时性时钟源，确保工作能正常进行。</p>
+<p>SYSCLK系统时钟的配置：还是从上图的时钟树出发，SYSCLK的时钟源可由HSI、HSE直接提供。或者HSI/2后经过PLLMUL倍频器提供，或者由HSE/2（HSE）经过PLLMUL倍频器提供。（倍频后最大为72MHz，因为在STM32系统中SYSCLK最大的时钟频率限度就是72MHz）<br>RTCCLK实时时钟的配置：还是从上图的时钟树出发，一般直接提取LSE作为RTCCLK实时时钟源，当然从时钟树也不难看出还可用HSE/128或者LSI来为RTCCLK实时时钟提供时钟源（但是该做法比较另类，一般都是直接用LSE的32.768KHz的外部晶振直接提供，得到的实时时钟也是最准确的）</p>
+<h3 id="STM32总线时钟的配置"><a href="#STM32总线时钟的配置" class="headerlink" title="STM32总线时钟的配置"></a>STM32总线时钟的配置</h3><p>还是从上图的时钟树出发，主要看SYSCLK右边的部分，SYSCLK右边的部分就是STM32的各种总线，对应时钟图根据各个总线的时钟频率限制便能配置出合适的总线时钟频率。有一个点需要注意AHB因为直接和SYSCLK时钟相连，所以它俩时钟频率一样。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>还是基于时钟树，STM32的时钟系统通过时钟树不难看出主要分为左边和右边部分，以SYSCLK作为分界线，左边主要是时钟源头的选取，右边则是各种STM32的外设总线时钟频率的限制和配置要求。所以在配置STM32的时钟系统时，充分的理解时钟树便能得到自己想要的时钟频率，在代码中进行编写，达到系统的稳定性，低功耗性，适当性等一系列特点。</p>
 ]]></content>
   </entry>
 </search>
