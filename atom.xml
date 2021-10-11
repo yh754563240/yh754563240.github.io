@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-10-11T09:00:10.831Z</updated>
+  <updated>2021-10-11T09:03:27.206Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://example.com/2021/10/11/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9A%E5%85%B3%E4%BA%8EFreeRTOS%E7%9A%84%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3/"/>
     <id>http://example.com/2021/10/11/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9A%E5%85%B3%E4%BA%8EFreeRTOS%E7%9A%84%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3/</id>
     <published>2021-10-11T08:48:40.440Z</published>
-    <updated>2021-10-11T09:00:10.831Z</updated>
+    <updated>2021-10-11T09:03:27.206Z</updated>
     
     <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>FreeRTOS的优势很明显，开源代码（任何个人和组织使用不需要担心任何版权问题，也不需要公开任何使用了的源码），市场占有率高（在嵌入式小型操作系统中市场占用率最高，大概为全球嵌入式操作系统市场的20%），移植简单（按照传统的步骤移植文件，进行相应的配置即可，不需进行任何底层驱动代码的修改），当前市场主流的嵌入式小型操作系统。</p><p>嵌入式：什么是嵌入式？嵌入式简单的表述就是3个主要的特征。专用的、可裁剪的、计算机系统。</p>]]></content>
     
