@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-10-11T09:03:27.206Z</updated>
+  <updated>2021-10-20T03:11:44.460Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>【图文】C语言：关于指针</title>
+    <link href="http://example.com/2021/10/19/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91C%E8%AF%AD%E8%A8%80%EF%BC%9A%E5%85%B3%E4%BA%8E%E6%8C%87%E9%92%88/"/>
+    <id>http://example.com/2021/10/19/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91C%E8%AF%AD%E8%A8%80%EF%BC%9A%E5%85%B3%E4%BA%8E%E6%8C%87%E9%92%88/</id>
+    <published>2021-10-19T08:57:52.436Z</published>
+    <updated>2021-10-20T03:11:44.460Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>什么是指针？通常所说的指针指的是指针变量，指针变量用来存放数据的地址，例如 int* a，官方叫法：一个指向了int类型数据的指针a。个人叫法：一个能存放int类型数据的地址变量a。上述为最初始和通俗理解的定义。指针是C语言特有的，指针的出现使得程序员或者系统能够在工程应用中直接操作内存地址进行一些函数的嵌套赋值或者优化工程运行效率，在一些特定的函数中必须得用指针才能完成相应的动作，例如最简单的两个值的 交换函数。因为函数不能嵌套在函数中嵌套定义，也不能嵌套作为参数传递，但是函数有一个特性，函数有地址，所有可以通过指针操作完成上述需求，因此指针的作用毋庸置疑。</p><p>###指针的类别</p><p>下述仅用int类型作为例子（float、long、double…均可使用）</p><p>普通变量：int a 读作：一个整型类型的数据a</p><p>普通指针：int* a 读作：一个指向整型类型的指针a（一个存放整型数据的指针a）</p><p>普通数组：int a[10] 读作：一个存放了10个整型数据的数组a</p><p>数组指针：<br>（1）int* a[10] 读作：一个存放了10个指针的数组a，指针存放整形数据a</p><p>（2）int（*a）[10] 读作：指针a存放了有10个整型数据的数组的地址 tip：是存放首地址还是10个数据的地址？？（一个指向有10个整型数数组的指针a）</p><p>函数指针（本质是一个指针，存放函数地址的指针）：<br>（1）int （*a）(int) 读作：一个指向函数的指针a，该函数有一个整型的参数类型，返回值的类型为整型</p><p>（2）int（*a[10]）（int）读作：一个有10个指针的数组a，该指针指向一个函数，该函数有一个整型的参数类型，返回值的类型为整型</p><p>指针函数（本质是一个函数，返回值类型为指针）：int* a（int）读作：一个函数a，该函数有一个整型的参数类型，返回值的类型为一个存放整形数据类型的指针变量</p><p>双重指针（多重指针同理）：<br>int* a；<br>int** b；<br>b = &amp;a</p><p>读作：定义一个（一重）指针a，定义一个（二重）指针b，指针a存放的是一个为整型的数据地址，b存放了指针a的地址，通过解址符，双层解址符**解址b，同样能得到该整形数据的值。</p><p>###指针的用法</p><p>&amp;：取址符 *：解址符    2个符号可以看作一对互逆运算的符号，都在指针应用过程中均有涉及。</p><p>例如 （普通最基础的指针用法）：</p><p>int a = 5；//定义一个整型数a的值为5<br>int <em>pa；//定义一个整型类型的指针为pa<br>pa = &amp;a；//获取a的地址赋值给指针变量pa<br>printf（“%d”，</em>pa）//在pa上加*，解地址运算，输出结果为5</p><p>数组指针同理：取出数组指针中的某个数据的地址赋值取值即可</p><p>###函数指针：</p><p>int (<em>f) (int x); /</em> 声明一个函数指针 */</p><p>f=func; /* 将func函数的首地址赋给指针f */</p><p>#include&lt;stdio.h&gt;</p><p>#include&lt;stdlib.h&gt;</p><pre><code>int max(int x,int y)&#123;int z;if(x&gt;y) z = x;else z= y;return z;&#125;int main()&#123;int max(int,int);int (*p)(int,int);int a,b,c;p= max;scanf(&quot;%d,%d&quot;,&amp;a,&amp;b);c = (*p)(a,b);printf(&quot;a=%d,b=%d,max=%d\n&quot;,a,b,c);return0;&#125;</code></pre><p>当申明为一个函数指针时，该指针是一个可存放函数地址的指针变量。</p><p>###指针函数：</p><p>类型标识符    *函数名(参数表)<br> int *f(x，y);</p><p>#include&lt;stdio.h&gt;</p><p>#include&lt;stdlib.h&gt;<br>     int* max(int m,int n);</p><pre><code> int* max(int x,int y) &#123;int* z;if(x&gt;y) z = x;else z= &amp;y;return z; //返回的是y值得地址&#125; int main( ) &#123; int* p;int a,b;scanf(&quot;%d,%d&quot;,&amp;a,&amp;b);p = max(a,b);printf(&quot;a=%d,b=%d,max=%d\n&quot;,a,b,&amp;p)return 0;&#125;</code></pre><p> 当一个函数声明其返回值为一个指针时，实际上就是返回一个地址给调用函数，以用于需要指针或地址的表达式中。</p><p>##总结</p><p>指针是C语言特有的，在一些特定的场合必须使用指针才能完成相应的动作和功能，例如嵌入式开发中的，无线以及有线的通讯部分、DMA的应用、函数嵌套参数的传递、在特定的地址写入特定的东西，例如STM32的RAM地址起始为0X2000 0000，在该处写入数据，那么则用到指针。指针可以优化一些繁琐的运算，加快例如STM32运行的工作效率，特定的地方非得用指针解决问题。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;什么是指针？通常所说的指针指的是指针变量，指针变量用来存放数据的地址，例如 int* a，官方叫法：一个指向了int类型数据的指针a。个人叫</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>【图文】STM32嵌入式开发：关于FreeRTOS的个人理解</title>
