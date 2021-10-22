@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>【图文】STM32嵌入式开发：STM32的栈、堆、全局区（静态区）、常量区、代码区、RAM、ROM</title>
+    <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9ASTM32%E7%9A%84%E6%A0%88%E3%80%81%E5%A0%86%E3%80%81%E5%85%A8%E5%B1%80%E5%8C%BA%EF%BC%88%E9%9D%99%E6%80%81%E5%8C%BA%EF%BC%89%E3%80%81%E5%B8%B8%E9%87%8F%E5%8C%BA%E3%80%81%E4%BB%A3%E7%A0%81%E5%8C%BA/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在一个STM32基于C/C++的程序中，只要有基于C/C++的程序的运行，那么代码、指令集、数据必然和栈（stack)、堆（heap）、全局区（静态区）、常量区、代码区、RAM、ROM息息相关，栈、堆、全局区（静态区）、常量区、代码区 的地址总是从栈（最高地址）到代码区（最低地址）排列。全局区（静态区）中又包含.bss段（相对在全局区里的高地址）和.data段（相对在全局区里的低地址）。</p>
+<p>下图以直观的方式使栈、堆、全局区（静态区）、常量区、代码区 的地址排序<br><img src="%E4%BB%A3%E7%A0%81%E6%AE%B5%E7%9A%84%E5%9C%B0%E5%9D%80%E6%8E%92%E5%BA%8F.png" alt="代码段的地址排序"></p>
+<h3 id="相关名词解释"><a href="#相关名词解释" class="headerlink" title="相关名词解释"></a>相关名词解释</h3><p>RAM(Random Access Memory)：随机存取存储器（随机读写存储器），存取的内容通过指令集进行随机性读写访问。RAM具有掉电丢失的特性，因此只能在开机状态下才能工作。RAM又分为SRAM（Static Random-Access Memory）静态随机存取存储器和DRAM（Dynamic Random Access Memory）动态随机存取存储器。<br>SRAM（Static Random-Access Memory）：静态随机存取存储器，在RAM的基础上延伸，只要通电，就能持之以恒的保存数据，但是掉电丢失。<br>DRAM（Dynamic Random Access Memory）：动态随机存取存储器，里面存储的数据需要周期性的更新。<br>ROM（Read-Only Memory）：只读存储器，顾名思义只能从该存储器里读取数据，而不能写入数据，相比RAM，它的容量小，价格高都是缺点。只在一些硬件写入BIOS或者以后不需要更改的数据的时候使用它。具有一次性的特点，还有一个最重要与RAM具有区分性的特点，掉电保存。<br>Flash Memory：闪存，可以理解为ROM的衍生物，ROM不断技术革新进步的产物，具有可以反复写入的特点，以及掉电保存的特点。<br>BSS（bss segment）：BSS段，一块在全局区（静态区）下的内存区域，一般用来存储未初始化或者已经初始化但是为0的数据。<br>DATA（data segment）：DATA段，一块在全局区（静态区）下的内存区域，一般用来存储已经初始化的数据。</p>
+<h3 id="栈、堆、全局区（静态区）、常量区、代码区-与RAM和ROM的关系"><a href="#栈、堆、全局区（静态区）、常量区、代码区-与RAM和ROM的关系" class="headerlink" title="栈、堆、全局区（静态区）、常量区、代码区 与RAM和ROM的关系"></a>栈、堆、全局区（静态区）、常量区、代码区 与RAM和ROM的关系</h3><p>栈、堆、全局区（静态区）存储在RAM中。<br>常量区、代码区 存储在ROM中。</p>
+<p>ps：RAM的地址在STM32中开头为0x20000000，ROM（flash）的地址在STM32中开头为0x08000000。<br>通过keil MDK的map接口文件，便能看到上述所对应的内存，验证了上述说法，对应地址便能看出在RAM还是ROM区,也能看出对应的.bss段和.data段和.text段，代码的本质就是由.bss段和.data段和.text段三块存储器内存段组成，.bss段存储未初始化或者初始化但是定义为0的数据，.data段存储初始化的数据，.text段存储程序代码段，可包含一些只读的常量，字符串或者常量例如数字等。</p>
+<p><img src="CODE%E5%8C%BA.png" alt="CODE区"><br>CODE区</p>
+<p><img src="RO%E5%8C%BA.png" alt="RO区"><br>RO区</p>
+<p><img src="RW%E5%8C%BA.png" alt="RW区"><br>RW区</p>
+<p><img src="MDK%E4%BB%A3%E7%A0%81%E8%BE%93%E5%87%BA%E4%BF%A1%E6%81%AF.png" alt="MDK代码输出信息"><br>通过上图刚好对应于3个区 CODE区、RO区、RW区</p>
+<p>ps：ZI-data为未初始化或者初始化为0的数据量。</p>
+<h3 id="栈区（stack）"><a href="#栈区（stack）" class="headerlink" title="栈区（stack）"></a>栈区（stack）</h3><p>1.存放局部变量<br>2.存放函数的入口参数，例如地址（函数被调用时候）<br>3.存放函数的返回参数（函数返回的时候）<br>4.存放常量，被const修饰的局部变量存放在此处</p>
+<h3 id="堆区（heap）"><a href="#堆区（heap）" class="headerlink" title="堆区（heap）"></a>堆区（heap）</h3><p>1.程序员分配的动态内存区域<br>2.程序员在C的IDE编译器中用malloc函数可以申请内存空间，用完后用free进行内存空间的释放，否则会出现内存泄漏的情况</p>
+<h3 id="全局区（静态区）"><a href="#全局区（静态区）" class="headerlink" title="全局区（静态区）"></a>全局区（静态区）</h3><p>1.存放全局变量<br>2.存放静态变量，静态变量用static修饰，静态变量分为全局静态变量和局部静态变量</p>
+<p>3.全局区（静态区）分为.bss段和.data段<br>.bss段：一般用来存储未初始化或者已经初始化但是为0的数据。<br>.data段：一般用来存储已经初始化的数据。<br>ps：const定义的全局变量存放在.rodata段。</p>
+<h3 id="常量区"><a href="#常量区" class="headerlink" title="常量区"></a>常量区</h3><p>1.字符或者字符串存放在常量区<br>2.常量区的数据不可以被修改</p>
+<h3 id="代码区"><a href="#代码区" class="headerlink" title="代码区"></a>代码区</h3><p>1.程序执行代码存放在代码区，也就是程序执行的指令集<br>2.有时一些常量字符或者字符串也存放在代码区</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在STM32的C/C++的程序中</p>
+<p>1.代码通常可以按区域划分，分为 栈（stack)、堆（heap）、全局区（静态区）、常量区、代码区 地址依次减少，栈区地址向下增长，先进后出，内存由系统（也就是编译器）自动分配，自动回收，堆区地址向上增长，由程序员用malloc函数申请内存空间，用完后用free函数进行内存空间的释放。ps：当栈区地址向下增长，当堆区地址向上增长，2个地址重合时，系统死机，终止运行。</p>
+<p>2.代码按照段划分，为.bss段，.data段，.text段，.bss段为未初始化，或者初始化了但是值为0的数据变量，存放在此。.data段为，顾名思义就是数据段，为初始化了的数据变量，存放在此。.text段为代码段，存放程序代码执行的例如指令集的一块区域。</p>
+<p>2.在keil MDK编译器中，代码通过编译后输出信息可以看出 有Code 代码区 ，RO-data（Read Only data）只读数据区，RW-data（Read Write data）读写数据区， ZI-data（Zero Initialie data）0初始化数据。</p>
+<p>一个map文件中编译后空间信息的实例：</p>
+<pre><code>Total RO  Size (Code + RO Data)                12404 (  12.11kB)
+Total RW  Size (RW Data + ZI Data)             19136 (  18.69kB)
+Total ROM Size (Code + RO Data + RW Data)      12496 (  12.20kB)
+</code></pre>
+<p>状态：程序存储时，可以看出ROM（flash）占用的空间为Code + RO Data + RW Data，也就是最终编译后的文件大小。<br>状态： 程序执行时的只读区域(RO)，占用的空间为Code + RO Data<br>状态：程序执行时的可读写区域(RW) ，占用的空间为RW Data + ZI Data</p>
+]]></content>
+  </entry>
+  <entry>
     <title>【图文】C语言：关于指针</title>
     <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91C%E8%AF%AD%E8%A8%80%EF%BC%9A%E5%85%B3%E4%BA%8E%E6%8C%87%E9%92%88/</url>
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>什么是指针？通常所说的指针指的是指针变量，指针变量用来存放数据的地址，例如 int* a，官方叫法：一个指向了int类型数据的指针a。个人叫法：一个能存放int类型数据的地址变量a。上述为最初始和通俗理解的定义。指针是C语言特有的，指针的出现使得程序员或者系统能够在工程应用中直接操作内存地址进行一些函数的嵌套赋值或者优化工程运行效率，在一些特定的函数中必须得用指针才能完成相应的动作，例如最简单的两个值的 交换函数。因为函数不能嵌套在函数中嵌套定义，也不能嵌套作为参数传递，但是函数有一个特性，函数有地址，所有可以通过指针操作完成上述需求，因此指针的作用毋庸置疑。</p>
@@ -92,44 +123,6 @@ return 0;
 ]]></content>
   </entry>
   <entry>
-    <title>【图文】STM32嵌入式开发：关于FreeRTOS的个人理解</title>
-    <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9A%E5%85%B3%E4%BA%8EFreeRTOS%E7%9A%84%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>FreeRTOS的优势很明显，开源代码（任何个人和组织使用不需要担心任何版权问题，也不需要公开任何使用了的源码），市场占有率高（在嵌入式小型操作系统中市场占用率最高，大概为全球嵌入式操作系统市场的20%），移植简单（按照传统的步骤移植文件，进行相应的配置即可，不需进行任何底层驱动代码的修改），当前市场主流的嵌入式小型操作系统。</p>
-<p>嵌入式：什么是嵌入式？嵌入式简单的表述就是3个主要的特征。专用的、可裁剪的、计算机系统。</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>【图文】STM32嵌入式开发：STM32的栈、堆、全局区（静态区）、常量区、代码区、RAM、ROM</title>
-    <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9ASTM32%E7%9A%84%E6%A0%88%E3%80%81%E5%A0%86%E3%80%81%E5%85%A8%E5%B1%80%E5%8C%BA%EF%BC%88%E9%9D%99%E6%80%81%E5%8C%BA%EF%BC%89%E3%80%81%E5%B8%B8%E9%87%8F%E5%8C%BA%E3%80%81%E4%BB%A3%E7%A0%81%E5%8C%BA/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在一个STM32基于C/C++的程序中，只要有基于C/C++的程序的运行，那么代码、指令集、数据必然和栈（stack)、堆（heap）、全局区（静态区）、常量区、代码区、RAM、ROM息息相关，栈、堆、全局区（静态区）、常量区、代码区 的地址总是从栈（最高地址）到代码区（最低地址）排列。全局区（静态区）中又包含.bss段（相对在全局区里的高地址）和.data段（相对在全局区里的低地址）。</p>
-<p>下图以直观的方式使栈、堆、全局区（静态区）、常量区、代码区 的地址排序<br><img src="%E4%BB%A3%E7%A0%81%E6%AE%B5%E7%9A%84%E5%9C%B0%E5%9D%80%E6%8E%92%E5%BA%8F.png" alt="代码段的地址排序"></p>
-<h3 id="相关名词解释"><a href="#相关名词解释" class="headerlink" title="相关名词解释"></a>相关名词解释</h3><p>RAM(Random Access Memory)：随机存取存储器（随机读写存储器），存取的内容通过指令集进行随机性读写访问。RAM具有掉电丢失的特性，因此只能在开机状态下才能工作。RAM又分为SRAM（Static Random-Access Memory）静态随机存取存储器和DRAM（Dynamic Random Access Memory）动态随机存取存储器。<br>SRAM（Static Random-Access Memory）：静态随机存取存储器，在RAM的基础上延伸，只要通电，就能持之以恒的保存数据，但是掉电丢失。<br>DRAM（Dynamic Random Access Memory）：动态随机存取存储器，里面存储的数据需要周期性的更新。<br>ROM（Read-Only Memory）：只读存储器，顾名思义只能从该存储器里读取数据，而不能写入数据，相比RAM，它的容量小，价格高都是缺点。只在一些硬件写入BIOS或者以后不需要更改的数据的时候使用它。具有一次性的特点，还有一个最重要与RAM具有区分性的特点，掉电保存。<br>Flash Memory：闪存，可以理解为ROM的衍生物，ROM不断技术革新进步的产物，具有可以反复写入的特点，以及掉电保存的特点。<br>BSS（bss segment）：BSS段，一块在全局区（静态区）下的内存区域，一般用来存储未初始化或者已经初始化但是为0的数据。<br>DATA（data segment）：DATA段，一块在全局区（静态区）下的内存区域，一般用来存储已经初始化的数据。</p>
-<h3 id="栈、堆、全局区（静态区）、常量区、代码区-与RAM和ROM的关系"><a href="#栈、堆、全局区（静态区）、常量区、代码区-与RAM和ROM的关系" class="headerlink" title="栈、堆、全局区（静态区）、常量区、代码区 与RAM和ROM的关系"></a>栈、堆、全局区（静态区）、常量区、代码区 与RAM和ROM的关系</h3><p>栈、堆、全局区（静态区）存储在RAM中。<br>常量区、代码区 存储在ROM中。</p>
-<p>ps：RAM的地址在STM32中开头为0x20000000，ROM（flash）的地址在STM32中开头为0x08000000。<br>通过keil MDK的map接口文件，便能看到上述所对应的内存，验证了上述说法，对应地址便能看出在RAM还是ROM区,也能看出对应的.bss段和.data段和.text段，代码的本质就是由.bss段和.data段和.text段三块存储器内存段组成，.bss段存储未初始化或者初始化但是定义为0的数据，.data段存储初始化的数据，.text段存储程序代码段，可包含一些只读的常量，字符串或者常量例如数字等。</p>
-<p><img src="CODE%E5%8C%BA.png" alt="CODE区"><br>CODE区</p>
-<p><img src="RO%E5%8C%BA.png" alt="RO区"><br>RO区</p>
-<p><img src="RW%E5%8C%BA.png" alt="RW区"><br>RW区</p>
-<p><img src="MDK%E4%BB%A3%E7%A0%81%E8%BE%93%E5%87%BA%E4%BF%A1%E6%81%AF.png" alt="MDK代码输出信息"><br>通过上图刚好对应于3个区 CODE区、RO区、RW区</p>
-<p>ps：ZI-data为未初始化或者初始化为0的数据量。</p>
-<h3 id="栈区（stack）"><a href="#栈区（stack）" class="headerlink" title="栈区（stack）"></a>栈区（stack）</h3><p>1.存放局部变量<br>2.存放函数的入口参数，例如地址（函数被调用时候）<br>3.存放函数的返回参数（函数返回的时候）<br>4.存放常量，被const修饰的局部变量存放在此处</p>
-<h3 id="堆区（heap）"><a href="#堆区（heap）" class="headerlink" title="堆区（heap）"></a>堆区（heap）</h3><p>1.程序员分配的动态内存区域<br>2.程序员在C的IDE编译器中用malloc函数可以申请内存空间，用完后用free进行内存空间的释放，否则会出现内存泄漏的情况</p>
-<h3 id="全局区（静态区）"><a href="#全局区（静态区）" class="headerlink" title="全局区（静态区）"></a>全局区（静态区）</h3><p>1.存放全局变量<br>2.存放静态变量，静态变量用static修饰，静态变量分为全局静态变量和局部静态变量</p>
-<p>3.全局区（静态区）分为.bss段和.data段<br>.bss段：一般用来存储未初始化或者已经初始化但是为0的数据。<br>.data段：一般用来存储已经初始化的数据。<br>ps：const定义的全局变量存放在.rodata段。</p>
-<h3 id="常量区"><a href="#常量区" class="headerlink" title="常量区"></a>常量区</h3><p>1.字符或者字符串存放在常量区<br>2.常量区的数据不可以被修改</p>
-<h3 id="代码区"><a href="#代码区" class="headerlink" title="代码区"></a>代码区</h3><p>1.程序执行代码存放在代码区，也就是程序执行的指令集<br>2.有时一些常量字符或者字符串也存放在代码区</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在STM32的C/C++的程序中</p>
-<p>1.代码通常可以按区域划分，分为 栈（stack)、堆（heap）、全局区（静态区）、常量区、代码区 地址依次减少，栈区地址向下增长，先进后出，内存由系统（也就是编译器）自动分配，自动回收，堆区地址向上增长，由程序员用malloc函数申请内存空间，用完后用free函数进行内存空间的释放。ps：当栈区地址向下增长，当堆区地址向上增长，2个地址重合时，系统死机，终止运行。</p>
-<p>2.代码按照段划分，为.bss段，.data段，.text段，.bss段为未初始化，或者初始化了但是值为0的数据变量，存放在此。.data段为，顾名思义就是数据段，为初始化了的数据变量，存放在此。.text段为代码段，存放程序代码执行的例如指令集的一块区域。</p>
-<p>2.在keil MDK编译器中，代码通过编译后输出信息可以看出 有Code 代码区 ，RO-data（Read Only data）只读数据区，RW-data（Read Write data）读写数据区， ZI-data（Zero Initialie data）0初始化数据。</p>
-<p>一个map文件中编译后空间信息的实例：</p>
-<pre><code>Total RO  Size (Code + RO Data)                12404 (  12.11kB)
-Total RW  Size (RW Data + ZI Data)             19136 (  18.69kB)
-Total ROM Size (Code + RO Data + RW Data)      12496 (  12.20kB)
-</code></pre>
-<p>状态：程序存储时，可以看出ROM（flash）占用的空间为Code + RO Data + RW Data，也就是最终编译后的文件大小。<br>状态： 程序执行时的只读区域(RO)，占用的空间为Code + RO Data<br>状态：程序执行时的可读写区域(RW) ，占用的空间为RW Data + ZI Data</p>
-]]></content>
-  </entry>
-  <entry>
     <title>【图文】STM32嵌入式开发：STM32的时钟树（STM32驱动的根本之源）</title>
     <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9ASTM32%E7%9A%84%E6%97%B6%E9%92%9F%E6%A0%91%EF%BC%88STM32%E9%A9%B1%E5%8A%A8%E7%9A%84%E6%A0%B9%E6%9C%AC%E4%B9%8B%E6%BA%90%EF%BC%89/</url>
     <content><![CDATA[<p><img src="20200317112515612.jpg" alt="20200317112515612"></p>
@@ -146,6 +139,13 @@ Total ROM Size (Code + RO Data + RW Data)      12496 (  12.20kB)
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>还是基于时钟树，STM32的时钟系统通过时钟树不难看出主要分为左边和右边部分，以SYSCLK作为分界线，左边主要是时钟源头的选取，右边则是各种STM32的外设总线时钟频率的限制和配置要求。所以在配置STM32的时钟系统时，充分的理解时钟树便能得到自己想要的时钟频率，在代码中进行编写，达到系统的稳定性，低功耗性，适当性等一系列特点。</p>
 <h2 id="精炼归纳"><a href="#精炼归纳" class="headerlink" title="精炼归纳"></a>精炼归纳</h2><p>时钟树（时钟系统）的作用：提供时钟频率节拍，单片机工作的必要（根本）条件，精确计时（现实世界的时间）的必要（根本）条件。没有时钟源单片机无法工作</p>
 <p>时钟树（时钟系统）能解决什么问题？答：驱使单片机系统进行工作，适当的配置适宜的对应相关外设的时钟频率能让单片机事半功倍，集成诸多优点。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>【图文】STM32嵌入式开发：关于FreeRTOS的个人理解</title>
+    <url>/2021/10/21/%E3%80%90%E5%9B%BE%E6%96%87%E3%80%91STM32%E5%B5%8C%E5%85%A5%E5%BC%8F%E5%BC%80%E5%8F%91%EF%BC%9A%E5%85%B3%E4%BA%8EFreeRTOS%E7%9A%84%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>FreeRTOS的优势很明显，开源代码（任何个人和组织使用不需要担心任何版权问题，也不需要公开任何使用了的源码），市场占有率高（在嵌入式小型操作系统中市场占用率最高，大概为全球嵌入式操作系统市场的20%），移植简单（按照传统的步骤移植文件，进行相应的配置即可，不需进行任何底层驱动代码的修改），当前市场主流的嵌入式小型操作系统。</p>
+<p>嵌入式：什么是嵌入式？嵌入式简单的表述就是3个主要的特征。专用的、可裁剪的、计算机系统。</p>
 ]]></content>
   </entry>
 </search>
